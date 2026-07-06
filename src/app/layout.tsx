@@ -3,6 +3,8 @@ import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import { GradientBackground } from "@/components/theme/GradientBackground";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
+import { StartupImages } from "@/components/pwa/StartupImages";
+import { ApiStatusBanner } from "@/components/ui/ApiStatusBanner";
 
 export const metadata: Metadata = {
   title: "拾聚 · 家庭协作 · 全景日历",
@@ -29,9 +31,11 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="h-full antialiased">
       <body className="min-h-full">
+        <StartupImages />
         <StoreProvider>
           <GradientBackground />
           <RegisterSW />
+          <ApiStatusBanner />
           {children}
         </StoreProvider>
       </body>

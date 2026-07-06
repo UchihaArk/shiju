@@ -53,13 +53,9 @@ body {
 }
 
 body {
-  /* 蜜桃 → 粉 → 琥珀多层渐变；底色作 warm fallback（状态栏区域不闪白） */
+  /* 底色作 warm fallback；全屏渐变由 GradientBackground（fixed div）绘制，
+     不用 background-attachment:fixed（移动端 Safari 有覆盖 bug 会留白边） */
   background-color: #ffcdd2;
-  background-image:
-    radial-gradient(120% 80% at 15% 0%, #ffe4d6 0%, rgba(255, 228, 214, 0) 55%),
-    radial-gradient(120% 80% at 100% 10%, #ffd1dc 0%, rgba(255, 209, 220, 0) 50%),
-    linear-gradient(180deg, #ffe9d6 0%, #ffcdd2 48%, #ffab91 100%);
-  background-attachment: fixed;
   color: #5a3a38;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

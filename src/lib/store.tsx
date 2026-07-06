@@ -15,6 +15,7 @@ import type { FamilyEvent, Member, Task } from "@/types";
 
 interface StoreValue {
   hydrated: boolean;
+  apiOnline: boolean;
   member: Member | null;
   members: Member[];
   events: FamilyEvent[];
@@ -33,6 +34,7 @@ const Ctx = createContext<StoreValue | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
+  const [apiOnline, setApiOnline] = useState(true);
   const [member, setMember] = useState<Member | null>(null);
   const [members, setMembers] = useState<Member[]>(MEMBERS); // 兜底，hydrate 后替换为 API 数据
   const [events, setEvents] = useState<FamilyEvent[]>([]);
@@ -47,8 +49,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         let ms: Member[];
         try {
           ms = await api.members();
+          setApiOnline(true);
         } catch {
           ms = MEMBERS; // Worker 未启动时兜底，登录页仍可显示
+          setApiOnline(false);
         }
         if (cancelled) return;
         setMembers(ms);
@@ -132,6 +136,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<StoreValue>(
     () => ({
       hydrated,
+      apiOnline,
       member,
       members,
       events,
@@ -147,6 +152,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       hydrated,
+      apiOnline,
       member,
       members,
       events,

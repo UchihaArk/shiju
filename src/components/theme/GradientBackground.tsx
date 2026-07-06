@@ -3,7 +3,10 @@ import { cn } from "@/lib/cn";
 /** 全屏暖色渐变 + 漂浮色块。固定铺底，置于内容之下。 */
 export function GradientBackground() {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-gradient-to-b from-[#ffe9d6] via-[#ffcdd2] to-[#ffab91]"
+    >
       <div className="absolute -left-16 -top-10 h-64 w-64 rounded-full bg-pink/40 blur-3xl animate-pulse-slow" />
       <div className="absolute right-[-60px] top-24 h-72 w-72 rounded-full bg-amber/40 blur-3xl animate-float-slow" />
       <div className="absolute bottom-[-40px] left-1/4 h-72 w-72 rounded-full bg-orange/35 blur-3xl animate-pulse-slow" />
