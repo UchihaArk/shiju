@@ -55,4 +55,12 @@ export const ACCENT: Record<
     solid: "bg-leaf text-white",
     soft: "bg-leaf/15",
   },
+  tan: {
+    chip: "bg-tan/30 text-tan-deep",
+    text: "text-tan-deep",
+    dot: "bg-tan",
+    border: "border-tan/50",
+    solid: "bg-tan text-tan-deep",
+    soft: "bg-tan/20",
+  },
 };

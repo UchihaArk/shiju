@@ -10,6 +10,7 @@ import { TaskList } from "@/components/event/TaskList";
 import { useStore } from "@/lib/store";
 import { Splash } from "@/components/ui/Splash";
 import { ACCENT } from "@/lib/colors";
+import { eventTypeMeta, hasTypeBadge } from "@/lib/eventTypes";
 import { cn } from "@/lib/cn";
 import type { Member } from "@/types";
 
@@ -51,7 +52,9 @@ export default function EventDetailPage() {
     );
   }
 
-  const accent = ACCENT[event.color];
+  const typeMeta = eventTypeMeta(event.color);
+  const accent = ACCENT[typeMeta.color];
+  const showType = hasTypeBadge(event.color);
   const [y, m, d] = event.date.split("-").map(Number);
   const date = new Date(y, m - 1, d);
   const creator = memberById(event.createdBy);
@@ -115,9 +118,14 @@ export default function EventDetailPage() {
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-bold leading-snug text-rose-deep">{event.title}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <AccentChip color={event.color}>
+              <AccentChip color={typeMeta.color}>
                 {m}月{d}日 · {WEEKDAY[date.getDay()]}
               </AccentChip>
+              {showType && (
+                <AccentChip color={typeMeta.color}>
+                  {typeMeta.emoji} {typeMeta.label}
+                </AccentChip>
+              )}
               {event.recurrence !== "once" && (
                 <span className="inline-flex items-center gap-0.5 rounded-full bg-white/50 px-2 py-0.5 text-[11px] text-rose-deep/60">
                   <Repeat className="h-2.5 w-2.5" />

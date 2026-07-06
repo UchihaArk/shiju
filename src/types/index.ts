@@ -3,7 +3,7 @@
  * Member → users, Event → events, Task → tasks
  */
 
-export type Role = "爸爸" | "妈妈" | "爷爷" | "奶奶" | "小满";
+export type Role = "爸爸" | "妈妈" | "爷爷" | "奶奶" | "小满" | "宠物";
 
 /** 暖色点缀板 key（对应 AccentChip 配色）。 */
 export type AccentColor =
@@ -11,7 +11,8 @@ export type AccentColor =
   | "pink"
   | "amber"
   | "orange"
-  | "leaf";
+  | "leaf"
+  | "tan";
 
 export type Recurrence = "once" | "monthly" | "yearly";
 export type BirthdayType = "solar" | "lunar";
@@ -47,7 +48,7 @@ export interface FamilyEvent {
   date: string;
   recurrence: Recurrence;
   createdBy: string;
-  color: AccentColor;
+  color: string; // 事件类型 key（见 lib/eventTypes）或旧颜色值
   subjectIds: string[]; // 主角 / 围绕者（可多选）
   taskIds: string[];
 }

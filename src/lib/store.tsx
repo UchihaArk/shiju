@@ -24,6 +24,7 @@ interface StoreValue {
   memberById: (id: string | null | undefined) => Member | undefined;
   pickMember: (m: Member) => void;
   logout: () => void;
+  reload: () => Promise<void>;
   addEvent: (input: CreateEventInput) => Promise<FamilyEvent>;
   claimTask: (taskId: string) => Promise<void>;
   completeTask: (taskId: string) => Promise<void>;
@@ -94,10 +95,36 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const pickMember = useCallback((m: Member) => {
-    setUid(m.id);
-    setMember(m);
+  const loadUserData = useCallback(async () => {
+    try {
+      const [es, ts] = await Promise.all([api.events(), api.tasks()]);
+      setEvents(es);
+      setTasks(ts);
+    } catch {
+      /* API 不可用，留空 */
+    }
   }, []);
+
+  const pickMember = useCallback(
+    (m: Member) => {
+      setUid(m.id);
+      setMember(m);
+      // 首次登录立即拉取事项（修复"首次进入拿不到事件清单"）
+      void loadUserData();
+    },
+    [loadUserData],
+  );
+
+  const reload = useCallback(async () => {
+    try {
+      const ms = await api.members();
+      setMembers(ms);
+      setApiOnline(true);
+      if (getUid()) await loadUserData();
+    } catch {
+      setApiOnline(false);
+    }
+  }, [loadUserData]);
 
   const logout = useCallback(() => {
     clearAll();
@@ -185,6 +212,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       memberById,
       pickMember,
       logout,
+      reload,
       addEvent,
       claimTask,
       completeTask,
@@ -207,6 +235,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       memberById,
       pickMember,
       logout,
+      reload,
       addEvent,
       claimTask,
       completeTask,

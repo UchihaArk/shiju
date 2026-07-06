@@ -1,6 +1,7 @@
 "use client";
 
 import { ACCENT } from "@/lib/colors";
+import { eventTypeMeta } from "@/lib/eventTypes";
 import { cn } from "@/lib/cn";
 import type { DayCalendar } from "@/types";
 
@@ -71,7 +72,7 @@ export function DayCell({
           {dots.map((e) => (
             <span
               key={e.id}
-              className={cn("h-1 w-1 rounded-full", ACCENT[e.color].dot)}
+              className={cn("h-1 w-1 rounded-full", ACCENT[eventTypeMeta(e.color).color].dot)}
             />
           ))}
           {extra > 0 && (

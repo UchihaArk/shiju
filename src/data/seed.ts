@@ -52,6 +52,16 @@ export const MEMBERS: Member[] = [
     birthdayType: "solar",
     birthday: { month: 6, day: 23 },
   },
+  {
+    id: "u_duole",
+    role: "宠物",
+    name: "宠物 · 多乐",
+    shortName: "多乐",
+    emoji: "🐶",
+    color: "tan",
+    birthdayType: "solar",
+    birthday: { month: 5, day: 15 },
+  },
 ];
 
 export const MEMBER_BY_ID: Record<string, Member> = Object.fromEntries(

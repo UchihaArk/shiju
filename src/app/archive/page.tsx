@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PhoneFrame } from "@/components/theme/PhoneFrame";
 import { GlassCard } from "@/components/theme/GlassCard";
 import { EventCard } from "@/components/event/EventCard";
-import { BottomNav } from "@/components/nav/BottomNav";
 import { useStore } from "@/lib/store";
 import { occurrencesInRange, lunarTextOf } from "@/lib/lunar";
 import { today, ymd } from "@/lib/date";
@@ -91,9 +90,8 @@ export default function ArchivePage() {
   }
 
   return (
-    <>
-      <PhoneFrame className="pt-[calc(env(safe-area-inset-top)+14px)] pb-28">
-        <h1 className="mb-1 px-1 text-xl font-bold text-rose-deep">事项归档</h1>
+    <PhoneFrame className="pt-[calc(env(safe-area-inset-top)+14px)] pb-28">
+        <h1 className="mb-1 px-1 text-xl font-bold text-rose-deep">全部事项</h1>
         <p className="mb-3 px-1 text-[11px] text-rose-deep/50">按 年度 / 季度 / 月度 查询全部事项</p>
 
         {/* 粒度切换 */}
@@ -226,7 +224,5 @@ export default function ArchivePage() {
           ))
         )}
       </PhoneFrame>
-      <BottomNav />
-    </>
   );
 }

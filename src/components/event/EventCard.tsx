@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, Repeat, Star } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { ACCENT } from "@/lib/colors";
+import { eventTypeMeta, hasTypeBadge } from "@/lib/eventTypes";
 import { cn } from "@/lib/cn";
-import type { AccentColor, FamilyEvent, Member } from "@/types";
+import type { FamilyEvent, Member } from "@/types";
 
 const RECURRENCE_LABEL: Record<FamilyEvent["recurrence"], string | null> = {
   once: null,
@@ -22,7 +23,9 @@ export function EventCard({
 }) {
   const router = useRouter();
   const { member, memberById } = useStore();
-  const accent = ACCENT[event.color as AccentColor];
+  const typeMeta = eventTypeMeta(event.color);
+  const accent = ACCENT[typeMeta.color];
+  const showType = hasTypeBadge(event.color);
   const rec = RECURRENCE_LABEL[event.recurrence];
 
   // 主角展示：自己是主角→「您是主角」，否则列出角色名
@@ -57,6 +60,17 @@ export function EventCard({
             <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-white/50 px-1.5 py-0.5 text-[10px] text-rose-deep/60">
               <Repeat className="h-2.5 w-2.5" />
               {rec}
+            </span>
+          )}
+          {showType && (
+            <span
+              className={cn(
+                "inline-flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px]",
+                accent.chip,
+              )}
+            >
+              {typeMeta.emoji}
+              {typeMeta.label}
             </span>
           )}
         </div>

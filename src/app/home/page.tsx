@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import { BirthdayCountdown } from "@/components/calendar/BirthdayCountdown";
 import { EventCard } from "@/components/event/EventCard";
-import { BottomNav } from "@/components/nav/BottomNav";
 import { PushToggle } from "@/components/push/PushToggle";
+import { PullToRefresh } from "@/components/ui/PullToRefresh";
 import { useStore } from "@/lib/store";
 import { nextOccurrence, lunarTextOf } from "@/lib/lunar";
 import { ACCENT } from "@/lib/colors";
@@ -33,7 +33,7 @@ interface DateGroup {
 
 export default function HomePage() {
   const router = useRouter();
-  const { hydrated, member, members, events, tasks, logout } = useStore();
+  const { hydrated, member, members, events, tasks, logout, reload } = useStore();
 
   const now = today();
   const todayKey = ymd(now.getFullYear(), now.getMonth() + 1, now.getDate());
@@ -101,8 +101,8 @@ export default function HomePage() {
           <BirthdayCountdown members={members} />
         </div>
 
-        {/* 可滚动事件列表 */}
-        <div className="no-scrollbar mt-2 flex-1 overflow-y-auto pb-28">
+        {/* 可滚动事件列表（下拉刷新） */}
+        <PullToRefresh onRefresh={reload} className="no-scrollbar mt-2 flex-1 overflow-y-auto pb-28">
           {groups.length === 0 ? (
             <p className="py-16 text-center text-sm text-rose-deep/40">
               今天往后暂无安排 ✨
@@ -140,9 +140,8 @@ export default function HomePage() {
               );
             })
           )}
-        </div>
+        </PullToRefresh>
       </div>
-      <BottomNav />
     </>
   );
 }

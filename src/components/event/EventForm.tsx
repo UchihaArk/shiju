@@ -7,15 +7,14 @@ import { useStore } from "@/lib/store";
 import { ACCENT } from "@/lib/colors";
 import { cn } from "@/lib/cn";
 import { today, ymd } from "@/lib/date";
-import type { AccentColor, FamilyEvent } from "@/types";
+import { EVENT_TYPES, type EventTypeKey } from "@/lib/eventTypes";
+import type { FamilyEvent } from "@/types";
 
 const RECURRENCE_OPTIONS: { value: FamilyEvent["recurrence"]; label: string }[] = [
   { value: "once", label: "单次" },
   { value: "monthly", label: "每月" },
   { value: "yearly", label: "每年" },
 ];
-
-const COLORS: AccentColor[] = ["rose", "pink", "amber", "orange", "leaf"];
 
 /** 校验 "YYYY-MM-DD" 是否合法，合法则原样返回，否则 null。 */
 function validDate(s?: string | null): string | null {
@@ -44,7 +43,7 @@ export function EventForm({
     () => event?.date ?? validDate(initialDate) ?? ymd(now.getFullYear(), now.getMonth() + 1, now.getDate()),
   );
   const [recurrence, setRecurrence] = useState<FamilyEvent["recurrence"]>(event?.recurrence ?? "once");
-  const [color, setColor] = useState<AccentColor>(event?.color ?? "rose");
+  const [eventType, setEventType] = useState<string>(event?.color ?? "regular");
   const [note, setNote] = useState(event?.note ?? "");
   const [subjectIds, setSubjectIds] = useState<string[]>(event?.subjectIds ?? []);
   const [subtasks, setSubtasks] = useState<{ title: string; assigneeId: string | null }[]>([
@@ -71,9 +70,9 @@ export function EventForm({
     setSubmitting(true);
     try {
       if (editing && event) {
-        await updateEvent(event.id, { title, note, date, recurrence, color, subjectIds });
+        await updateEvent(event.id, { title, note, date, recurrence, color: eventType, subjectIds });
       } else {
-        await addEvent({ title, note, date, recurrence, color, subjectIds, subtasks });
+        await addEvent({ title, note, date, recurrence, color: eventType, subjectIds, subtasks });
       }
       onDone();
     } catch (err) {
@@ -160,26 +159,31 @@ export function EventForm({
         </div>
       </GlassCard>
 
-      {/* 颜色 */}
+      {/* 事件类型 */}
       <GlassCard className="px-4 py-3">
         <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-rose-deep/70">
           <Palette className="h-3.5 w-3.5" />
-          主题色
+          事件类型
         </div>
-        <div className="flex gap-3">
-          {COLORS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setColor(c)}
-              aria-label={c}
-              className={cn(
-                "h-8 w-8 rounded-full transition active:scale-90",
-                ACCENT[c].dot,
-                color === c && "ring-2 ring-rose-deep ring-offset-2 ring-offset-white/40",
-              )}
-            />
-          ))}
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(EVENT_TYPES) as EventTypeKey[]).map((k) => {
+            const t = EVENT_TYPES[k];
+            const selected = eventType === k;
+            return (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setEventType(k)}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition active:scale-95",
+                  selected ? ACCENT[t.color].solid : "bg-white/40 text-rose-deep/55",
+                )}
+              >
+                <span>{t.emoji}</span>
+                {t.label}
+              </button>
+            );
+          })}
         </div>
       </GlassCard>
 

@@ -7,7 +7,6 @@ import { PhoneFrame } from "@/components/theme/PhoneFrame";
 import { GlassCard } from "@/components/theme/GlassCard";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { DayDetail } from "@/components/calendar/DayDetail";
-import { BottomNav } from "@/components/nav/BottomNav";
 import { PushToggle } from "@/components/push/PushToggle";
 import { useStore } from "@/lib/store";
 import { getMonthCalendar } from "@/lib/lunar";
@@ -95,8 +94,7 @@ export default function CalendarPage() {
   const accent = ACCENT[member.color];
 
   return (
-    <>
-      <PhoneFrame className="pt-[calc(env(safe-area-inset-top)+14px)] pb-28">
+    <PhoneFrame className="pt-[calc(env(safe-area-inset-top)+14px)] pb-28">
         {/* 顶栏 */}
         <header className="mb-3 flex items-center justify-between">
           <button
@@ -160,7 +158,5 @@ export default function CalendarPage() {
           <DayDetail day={selectedDay} />
         </div>
       </PhoneFrame>
-      <BottomNav />
-    </>
   );
 }

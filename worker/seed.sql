@@ -7,7 +7,8 @@ INSERT OR IGNORE INTO users (id, name, short_name, role, emoji, color, birthday_
 ('u_ma',  '妈妈 · 佳琪', '佳琪', '妈妈', '👩', 'rose',   'lunar', 9, 12),
 ('u_ye',  '爷爷 · 豪子', '豪子', '爷爷', '👴', 'amber', 'lunar', 10, 8),
 ('u_nai', '奶奶 · 梅子', '梅子', '奶奶', '👵', 'leaf',  'lunar', 1, 28),
-('u_xm',  '小满 · 小满', '小满', '小满', '🧒', 'pink',  'solar', 6, 23);
+('u_xm',  '小满 · 小满', '小满', '小满', '🧒', 'pink',  'solar', 6, 23),
+('u_duole','宠物 · 多乐', '多乐', '宠物', '🐶', 'tan',   'solar', 5, 15);
 
 -- 事项
 INSERT OR IGNORE INTO events (id, title, note, date, recurrence, created_by, color) VALUES
@@ -45,3 +46,4 @@ UPDATE users SET name='妈妈 · 佳琪', short_name='佳琪', birthday_type='lu
 UPDATE users SET name='爷爷 · 豪子', short_name='豪子', birthday_type='lunar', birthday_month=10, birthday_day=8  WHERE id='u_ye';
 UPDATE users SET name='奶奶 · 梅子', short_name='梅子', birthday_type='lunar', birthday_month=1,  birthday_day=28 WHERE id='u_nai';
 UPDATE users SET name='小满 · 小满', short_name='小满', birthday_type='solar', birthday_month=6,  birthday_day=23 WHERE id='u_xm';
+UPDATE users SET name='宠物 · 多乐', short_name='多乐', birthday_type='solar', birthday_month=5,  birthday_day=15 WHERE id='u_duole';

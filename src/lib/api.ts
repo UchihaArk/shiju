@@ -26,7 +26,7 @@ export interface CreateEventInput {
   note?: string;
   date: string;
   recurrence: Recurrence;
-  color: AccentColor;
+  color: string;
   subjectIds?: string[];
   subtasks?: { title: string; assigneeId?: string | null }[];
 }
@@ -36,7 +36,7 @@ export interface EventPatch {
   note?: string | null;
   date?: string;
   recurrence?: Recurrence;
-  color?: AccentColor;
+  color?: string;
   subjectIds?: string[];
 }
 

@@ -5,6 +5,7 @@ import { GradientBackground } from "@/components/theme/GradientBackground";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
 import { StartupImages } from "@/components/pwa/StartupImages";
 import { ApiStatusBanner } from "@/components/ui/ApiStatusBanner";
+import { BottomNav } from "@/components/nav/BottomNav";
 
 export const metadata: Metadata = {
   title: "拾聚 · 家庭协作 · 全景日历",
@@ -37,6 +38,7 @@ export default function RootLayout({
           <RegisterSW />
           <ApiStatusBanner />
           {children}
+          <BottomNav />
         </StoreProvider>
       </body>
     </html>
