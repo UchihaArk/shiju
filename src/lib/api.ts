@@ -28,7 +28,7 @@ export interface CreateEventInput {
   recurrence: Recurrence;
   color: AccentColor;
   subjectIds?: string[];
-  subtasks?: string[];
+  subtasks?: { title: string; assigneeId?: string | null }[];
 }
 
 export interface EventPatch {
@@ -52,8 +52,16 @@ export const api = {
   updateEvent: (id: string, patch: EventPatch) =>
     req<FamilyEvent>(`/api/events/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   deleteEvent: (id: string) => req<{ ok: boolean }>(`/api/events/${id}`, { method: "DELETE" }),
-  addTask: (eventId: string, title: string) =>
-    req<Task>(`/api/events/${eventId}/tasks`, { method: "POST", body: JSON.stringify({ title }) }),
+  addTask: (eventId: string, title: string, assigneeId?: string | null) =>
+    req<Task>(`/api/events/${eventId}/tasks`, {
+      method: "POST",
+      body: JSON.stringify({ title, assigneeId }),
+    }),
+  assignTask: (taskId: string, assigneeId: string) =>
+    req<Task>(`/api/tasks/${taskId}/assign`, {
+      method: "POST",
+      body: JSON.stringify({ assigneeId }),
+    }),
   updateTask: (id: string, title: string) =>
     req<Task>(`/api/tasks/${id}`, { method: "PATCH", body: JSON.stringify({ title }) }),
   deleteTask: (id: string) => req<{ ok: boolean }>(`/api/tasks/${id}`, { method: "DELETE" }),

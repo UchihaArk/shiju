@@ -24,7 +24,8 @@ export const events = sqliteTable("events", {
     .notNull()
     .references(() => users.id),
   color: text("color").notNull(),
-  subjectIds: text("subject_id"), // 复用 0002 列名；去掉 FK 以存 JSON string[]
+  subjectId: text("subject_id").references(() => users.id), // 旧单主角列（0002 建），保留以免 drizzle 重建；代码不再使用
+  subjectIds: text("subject_ids"), // 多主角 JSON string[]（新列，无 FK）
 });
 
 /** 子任务（→ 前端 Task，认领机制） */

@@ -16,8 +16,9 @@ export function TaskList({
   eventId: string;
   canManage: boolean;
 }) {
-  const { addTask } = useStore();
+  const { addTask, members } = useStore();
   const [newTitle, setNewTitle] = useState("");
+  const [newAssignee, setNewAssignee] = useState("");
   const total = tasks.length;
   const done = tasks.filter((t) => t.status === "done").length;
   const pct = total === 0 ? 0 : Math.round((done / total) * 100);
@@ -26,8 +27,9 @@ export function TaskList({
     const t = newTitle.trim();
     if (!t) return;
     try {
-      await addTask(eventId, t);
+      await addTask(eventId, t, newAssignee || null);
       setNewTitle("");
+      setNewAssignee("");
     } catch (e) {
       console.error(e);
     }
@@ -62,24 +64,38 @@ export function TaskList({
       </div>
 
       {canManage && (
-        <div className="mt-3 flex items-center gap-2">
-          <input
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleAdd();
-            }}
-            placeholder="新增子任务…"
-            className="w-full rounded-xl bg-white/45 px-3 py-2 text-sm text-rose-deep placeholder:text-rose-deep/35 focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={handleAdd}
-            aria-label="添加子任务"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-rose text-white active:scale-90"
+        <div className="mt-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAdd();
+              }}
+              placeholder="新增子任务…"
+              className="w-full rounded-xl bg-white/45 px-3 py-2 text-sm text-rose-deep placeholder:text-rose-deep/35 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleAdd}
+              aria-label="添加子任务"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-rose text-white active:scale-90"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+          <select
+            value={newAssignee}
+            onChange={(e) => setNewAssignee(e.target.value)}
+            className="w-full rounded-xl bg-white/45 px-3 py-1.5 text-xs text-rose-deep focus:outline-none"
           >
-            <Plus className="h-4 w-4" />
-          </button>
+            <option value="">指派给：无人（等待认领）</option>
+            {members.map((m) => (
+              <option key={m.id} value={m.id}>
+                指派给：{m.role}
+              </option>
+            ))}
+          </select>
         </div>
       )}
     </GlassCard>

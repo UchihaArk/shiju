@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5224f6ce-8215-40f4-9e2e-72e51b720742",
+  "id": "d5ca895c-e17e-479c-a532-c9bfe31ac3aa",
   "prevId": "6e1a546f-a07e-413e-9ad1-30c21d3c9f5e",
   "tables": {
     "events": {
@@ -62,6 +62,13 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "subject_ids": {
+          "name": "subject_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -72,6 +79,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_subject_id_users_id_fk": {
+          "name": "events_subject_id_users_id_fk",
+          "tableFrom": "events",
+          "tableTo": "users",
+          "columnsFrom": [
+            "subject_id"
           ],
           "columnsTo": [
             "id"

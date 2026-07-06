@@ -46,6 +46,30 @@ tasksRouter.post("/:id/complete", async (c) => {
   return c.json(toTask(row));
 });
 
+/** 指派认领人（仅事项创建者；已完成不可指派）。 */
+tasksRouter.post("/:id/assign", async (c) => {
+  const member = c.get("member");
+  const id = c.req.param("id");
+  const db = getDb(c.env.DB);
+  const task = await db.select().from(tasks).where(eq(tasks.id, id)).get();
+  if (!task) return c.json({ error: "not found" }, 404);
+  if (task.status === "done") return c.json({ error: "已完成的任务不可指派" }, 400);
+  const event = await db.select().from(events).where(eq(events.id, task.eventId)).get();
+  if (!event || event.createdBy !== member.id) return c.json({ error: "forbidden" }, 403);
+  const body = await c.req.json<{ assigneeId: string }>();
+  if (!body.assigneeId) return c.json({ error: "assigneeId required" }, 400);
+  await db
+    .update(tasks)
+    .set({
+      status: "claimed",
+      assigneeId: body.assigneeId,
+      claimedAt: new Date().toISOString(),
+    })
+    .where(eq(tasks.id, id));
+  const row = await db.select().from(tasks).where(eq(tasks.id, id)).get();
+  return c.json(toTask(row!));
+});
+
 /** 编辑子任务标题（仅事项创建者；已完成不可改）。 */
 tasksRouter.patch("/:id", async (c) => {
   const member = c.get("member");

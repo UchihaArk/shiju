@@ -47,14 +47,19 @@ export function EventForm({
   const [color, setColor] = useState<AccentColor>(event?.color ?? "rose");
   const [note, setNote] = useState(event?.note ?? "");
   const [subjectIds, setSubjectIds] = useState<string[]>(event?.subjectIds ?? []);
-  const [subtasks, setSubtasks] = useState<string[]>([""]);
+  const [subtasks, setSubtasks] = useState<{ title: string; assigneeId: string | null }[]>([
+    { title: "", assigneeId: null },
+  ]);
   const [submitting, setSubmitting] = useState(false);
 
   function setSubtask(i: number, v: string) {
-    setSubtasks((prev) => prev.map((s, idx) => (idx === i ? v : s)));
+    setSubtasks((prev) => prev.map((s, idx) => (idx === i ? { ...s, title: v } : s)));
+  }
+  function setSubtaskAssignee(i: number, assigneeId: string | null) {
+    setSubtasks((prev) => prev.map((s, idx) => (idx === i ? { ...s, assigneeId } : s)));
   }
   function addSubtask() {
-    setSubtasks((prev) => [...prev, ""]);
+    setSubtasks((prev) => [...prev, { title: "", assigneeId: null }]);
   }
   function removeSubtask(i: number) {
     setSubtasks((prev) => prev.filter((_, idx) => idx !== i));
@@ -197,24 +202,38 @@ export function EventForm({
             子任务（家人可认领）
           </div>
           <div className="space-y-2">
-            {subtasks.map((s, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <input
-                  value={s}
-                  onChange={(e) => setSubtask(i, e.target.value)}
-                  placeholder={`子任务 ${i + 1}，如：买菜`}
-                  className="w-full rounded-xl bg-white/45 px-3 py-2 text-sm text-rose-deep placeholder:text-rose-deep/35 focus:outline-none"
-                />
-                {subtasks.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeSubtask(i)}
-                    aria-label="删除"
-                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/40 text-rose-deep/50 active:scale-90"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
+            {subtasks.map((st, i) => (
+              <div key={i} className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <input
+                    value={st.title}
+                    onChange={(e) => setSubtask(i, e.target.value)}
+                    placeholder={`子任务 ${i + 1}，如：买菜`}
+                    className="w-full rounded-xl bg-white/45 px-3 py-2 text-sm text-rose-deep placeholder:text-rose-deep/35 focus:outline-none"
+                  />
+                  {subtasks.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSubtask(i)}
+                      aria-label="删除"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/40 text-rose-deep/50 active:scale-90"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+                <select
+                  value={st.assigneeId ?? ""}
+                  onChange={(e) => setSubtaskAssignee(i, e.target.value || null)}
+                  className="w-full rounded-xl bg-white/45 px-3 py-1.5 text-xs text-rose-deep focus:outline-none"
+                >
+                  <option value="">指派给：无人（等待认领）</option>
+                  {members.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      指派给：{m.role}
+                    </option>
+                  ))}
+                </select>
               </div>
             ))}
           </div>

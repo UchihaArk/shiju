@@ -29,9 +29,10 @@ interface StoreValue {
   completeTask: (taskId: string) => Promise<void>;
   updateEvent: (id: string, patch: EventPatch) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
-  addTask: (eventId: string, title: string) => Promise<void>;
+  addTask: (eventId: string, title: string, assigneeId?: string | null) => Promise<void>;
   updateTask: (taskId: string, title: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
+  assignTask: (taskId: string, assigneeId: string) => Promise<void>;
   resetAll: () => void;
 }
 
@@ -142,9 +143,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setTasks((prev) => prev.filter((t) => t.eventId !== id));
   }, []);
 
-  const addTask = useCallback(async (eventId: string, title: string) => {
-    const t = await api.addTask(eventId, title);
-    setTasks((prev) => [...prev, t]);
+  const addTask = useCallback(
+    async (eventId: string, title: string, assigneeId?: string | null) => {
+      const t = await api.addTask(eventId, title, assigneeId);
+      setTasks((prev) => [...prev, t]);
+    },
+    [],
+  );
+
+  const assignTask = useCallback(async (taskId: string, assigneeId: string) => {
+    const t = await api.assignTask(taskId, assigneeId);
+    setTasks((prev) => prev.map((x) => (x.id === taskId ? t : x)));
   }, []);
 
   const updateTask = useCallback(async (taskId: string, title: string) => {
@@ -184,6 +193,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addTask,
       updateTask,
       deleteTask,
+      assignTask,
       resetAll,
     }),
     [
@@ -205,6 +215,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addTask,
       updateTask,
       deleteTask,
+      assignTask,
       resetAll,
     ],
   );

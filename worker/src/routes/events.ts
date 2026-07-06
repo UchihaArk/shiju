@@ -39,7 +39,7 @@ eventsRouter.post("/", async (c) => {
     recurrence: "once" | "monthly" | "yearly";
     color: string;
     subjectIds?: string[];
-    subtasks?: string[];
+    subtasks?: Array<{ title: string; assigneeId?: string | null } | string>;
   }>();
 
   if (!body.title?.trim()) return c.json({ error: "title required" }, 400);
@@ -49,15 +49,18 @@ eventsRouter.post("/", async (c) => {
   const now = Date.now();
   const subjectIds = (body.subjectIds ?? []).filter((s): s is string => typeof s === "string");
   const subtaskRows = (body.subtasks ?? [])
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((title, i) => ({
+    .map((s) => {
+      if (typeof s === "string") return { title: s.trim(), assigneeId: null as string | null };
+      return { title: (s.title ?? "").trim(), assigneeId: s.assigneeId || null };
+    })
+    .filter((s) => s.title)
+    .map((s, i) => ({
       id: `t_${now}_${i}`,
       eventId,
-      title,
-      assigneeId: null,
-      status: "unclaimed" as const,
-      claimedAt: null,
+      title: s.title,
+      assigneeId: s.assigneeId,
+      status: s.assigneeId ? ("claimed" as const) : ("unclaimed" as const),
+      claimedAt: s.assigneeId ? new Date().toISOString() : null,
       doneAt: null,
     }));
 
@@ -111,6 +114,7 @@ eventsRouter.post("/", async (c) => {
           recurrence: body.recurrence,
           createdBy: member.id,
           color: body.color,
+          subjectId: null,
           subjectIds: JSON.stringify(subjectIds),
         },
         subtaskRows.map((t) => t.id),
@@ -178,16 +182,16 @@ eventsRouter.post("/:id/tasks", async (c) => {
   const existing = await db.select().from(events).where(eq(events.id, id)).get();
   if (!existing) return c.json({ error: "not found" }, 404);
   if (existing.createdBy !== member.id) return c.json({ error: "forbidden" }, 403);
-  const body = await c.req.json<{ title: string }>();
+  const body = await c.req.json<{ title: string; assigneeId?: string | null }>();
   if (!body.title?.trim()) return c.json({ error: "title required" }, 400);
   const taskId = `t_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
   await db.insert(tasks).values({
     id: taskId,
     eventId: id,
     title: body.title.trim(),
-    assigneeId: null,
-    status: "unclaimed",
-    claimedAt: null,
+    assigneeId: body.assigneeId || null,
+    status: body.assigneeId ? "claimed" : "unclaimed",
+    claimedAt: body.assigneeId ? new Date().toISOString() : null,
     doneAt: null,
   });
   const row = await db.select().from(tasks).where(eq(tasks.id, taskId)).get();
