@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "shiju-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "shiju",
+      "database_id": "de0e0957-1a06-49e4-b2f3-dc3570fc3f4c",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "triggers": {
+    "crons": ["0 12 * * *"]
+  },
+  "vars": {
+    "CORS_ORIGIN": "*"
+  }
+  // VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY 经 `wrangler secret put` 设置；
+  // 本地开发写进 .dev.vars（已 gitignore）
+}
