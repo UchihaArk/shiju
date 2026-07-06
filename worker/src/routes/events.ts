@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { eq } from "drizzle-orm";
 import { getDb } from "../db";
-import { events, tasks } from "../schema";
+import { events, subscriptions, tasks } from "../schema";
 import { toEvent, toTask } from "../serialize";
 import { requireMember } from "../auth";
+import { initPush, sendPush } from "../push";
 import type { AppEnv, MemberDTO } from "../types";
 
 export const eventsRouter = new Hono<{
@@ -37,7 +38,7 @@ eventsRouter.post("/", async (c) => {
     date: string;
     recurrence: "once" | "monthly" | "yearly";
     color: string;
-    subjectId?: string | null;
+    subjectIds?: string[];
     subtasks?: string[];
   }>();
 
@@ -46,6 +47,7 @@ eventsRouter.post("/", async (c) => {
   const db = getDb(c.env.DB);
   const eventId = `e_${Date.now()}`;
   const now = Date.now();
+  const subjectIds = (body.subjectIds ?? []).filter((s): s is string => typeof s === "string");
   const subtaskRows = (body.subtasks ?? [])
     .map((s) => s.trim())
     .filter(Boolean)
@@ -68,10 +70,35 @@ eventsRouter.post("/", async (c) => {
       recurrence: body.recurrence,
       createdBy: member.id,
       color: body.color,
-      subjectId: body.subjectId || null,
+      subjectIds: JSON.stringify(subjectIds),
     }),
     ...subtaskRows.map((t) => db.insert(tasks).values(t)),
   ]);
+
+  // 立即推送通知给所有家人（除发布者），不阻塞响应
+  try {
+    initPush(c.env);
+    const subs = await db.select().from(subscriptions).all();
+    const payload = {
+      title: `${member.role}发布了新事项`,
+      body: body.title.trim(),
+      data: { url: `/events/${eventId}` },
+    };
+    c.executionCtx.waitUntil(
+      Promise.all(
+        subs
+          .filter((s) => s.userId !== member.id)
+          .map((s) =>
+            sendPush(
+              { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+              payload,
+            ),
+          ),
+      ),
+    );
+  } catch (e) {
+    console.error("[events] push failed", e);
+  }
 
   return c.json(
     {
@@ -84,7 +111,7 @@ eventsRouter.post("/", async (c) => {
           recurrence: body.recurrence,
           createdBy: member.id,
           color: body.color,
-          subjectId: body.subjectId || null,
+          subjectIds: JSON.stringify(subjectIds),
         },
         subtaskRows.map((t) => t.id),
       ),
@@ -109,7 +136,7 @@ eventsRouter.put("/:id", async (c) => {
     date?: string;
     recurrence?: "once" | "monthly" | "yearly";
     color?: string;
-    subjectId?: string | null;
+    subjectIds?: string[];
   }>();
 
   await db
@@ -120,7 +147,8 @@ eventsRouter.put("/:id", async (c) => {
       date: body.date ?? existing.date,
       recurrence: body.recurrence ?? existing.recurrence,
       color: body.color ?? existing.color,
-      subjectId: body.subjectId !== undefined ? body.subjectId || null : existing.subjectId,
+      subjectIds:
+        body.subjectIds !== undefined ? JSON.stringify(body.subjectIds) : existing.subjectIds,
     })
     .where(eq(events.id, id));
 

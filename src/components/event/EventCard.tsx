@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Repeat } from "lucide-react";
+import { CheckCircle2, Repeat, Star } from "lucide-react";
+import { useStore } from "@/lib/store";
 import { ACCENT } from "@/lib/colors";
 import { cn } from "@/lib/cn";
-import type { AccentColor, FamilyEvent } from "@/types";
+import type { AccentColor, FamilyEvent, Member } from "@/types";
 
 const RECURRENCE_LABEL: Record<FamilyEvent["recurrence"], string | null> = {
   once: null,
@@ -20,8 +21,22 @@ export function EventCard({
   progress?: { done: number; total: number };
 }) {
   const router = useRouter();
+  const { member, memberById } = useStore();
   const accent = ACCENT[event.color as AccentColor];
   const rec = RECURRENCE_LABEL[event.recurrence];
+
+  // 主角展示：自己是主角→「您是主角」，否则列出角色名
+  const subjectIds = event.subjectIds ?? [];
+  const subjects = subjectIds.map((id) => memberById(id)).filter(Boolean) as Member[];
+  const meIncluded = !!member && subjectIds.includes(member.id);
+  const otherSubjects = subjects.filter((s) => s.id !== member?.id);
+  const subjectLabel: string | null = (() => {
+    if (subjects.length === 0) return null;
+    if (meIncluded && otherSubjects.length === 0) return "您是主角";
+    const parts: string[] = meIncluded ? ["您"] : [];
+    for (const s of otherSubjects) parts.push(s.role);
+    return `主角：${parts.join("、")}`;
+  })();
 
   return (
     <button
@@ -53,6 +68,19 @@ export function EventCard({
             <CheckCircle2 className="h-3 w-3" />
             <span>
               {progress.done}/{progress.total} 已完成
+            </span>
+          </div>
+        )}
+        {subjectLabel && (
+          <div className="mt-1 flex items-center gap-1 text-[11px]">
+            <Star className="h-3 w-3 shrink-0 text-amber-deep" />
+            <span
+              className={cn(
+                "truncate",
+                meIncluded ? "font-semibold text-amber-deep" : "text-rose-deep/55",
+              )}
+            >
+              {subjectLabel}
             </span>
           </div>
         )}

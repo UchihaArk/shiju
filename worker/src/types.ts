@@ -41,6 +41,6 @@ export interface EventDTO {
   recurrence: Recurrence;
   createdBy: string;
   color: string;
-  subjectId: string | null;
+  subjectIds: string[];
   taskIds: string[];
 }

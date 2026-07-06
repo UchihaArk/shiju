@@ -11,6 +11,7 @@ import { useStore } from "@/lib/store";
 import { Splash } from "@/components/ui/Splash";
 import { ACCENT } from "@/lib/colors";
 import { cn } from "@/lib/cn";
+import type { Member } from "@/types";
 
 const WEEKDAY = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const RECURRENCE: Record<string, string> = {
@@ -54,9 +55,20 @@ export default function EventDetailPage() {
   const [y, m, d] = event.date.split("-").map(Number);
   const date = new Date(y, m - 1, d);
   const creator = memberById(event.createdBy);
-  const subject = event.subjectId ? memberById(event.subjectId) : undefined;
   const evTasks = tasksByEvent(event.id);
   const canManage = event.createdBy === member.id;
+
+  // 主角（多选）展示
+  const sids = event.subjectIds ?? [];
+  const subjects = sids.map((id) => memberById(id)).filter(Boolean) as Member[];
+  const meIncluded = !!member && sids.includes(member.id);
+  const otherSubjects = subjects.filter((s) => s.id !== member?.id);
+  const subjectLabel =
+    subjects.length === 0
+      ? null
+      : meIncluded && otherSubjects.length === 0
+        ? "您是主角"
+        : `主角：${(meIncluded ? ["您"] : []).concat(otherSubjects.map((s) => s.role)).join("、")}`;
 
   async function handleDelete() {
     await deleteEvent(event!.id);
@@ -112,9 +124,9 @@ export default function EventDetailPage() {
                   {RECURRENCE[event.recurrence]}
                 </span>
               )}
-              {subject && (
-                <AccentChip color={subject.color as never}>
-                  <Star className="h-2.5 w-2.5" /> 主角 · {subject.role}
+              {subjectLabel && (
+                <AccentChip color={meIncluded ? "amber" : "pink"}>
+                  <Star className="h-2.5 w-2.5" /> {subjectLabel}
                 </AccentChip>
               )}
             </div>

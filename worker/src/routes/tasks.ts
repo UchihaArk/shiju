@@ -46,13 +46,14 @@ tasksRouter.post("/:id/complete", async (c) => {
   return c.json(toTask(row));
 });
 
-/** 编辑子任务标题（仅事项创建者）。 */
+/** 编辑子任务标题（仅事项创建者；已完成不可改）。 */
 tasksRouter.patch("/:id", async (c) => {
   const member = c.get("member");
   const id = c.req.param("id");
   const db = getDb(c.env.DB);
   const task = await db.select().from(tasks).where(eq(tasks.id, id)).get();
   if (!task) return c.json({ error: "not found" }, 404);
+  if (task.status === "done") return c.json({ error: "已完成的任务不可修改" }, 400);
   const event = await db.select().from(events).where(eq(events.id, task.eventId)).get();
   if (!event || event.createdBy !== member.id) return c.json({ error: "forbidden" }, 403);
   const body = await c.req.json<{ title: string }>();
@@ -62,13 +63,14 @@ tasksRouter.patch("/:id", async (c) => {
   return c.json(toTask(row!));
 });
 
-/** 删除子任务（仅事项创建者）。 */
+/** 删除子任务（仅事项创建者；已完成不可删）。 */
 tasksRouter.delete("/:id", async (c) => {
   const member = c.get("member");
   const id = c.req.param("id");
   const db = getDb(c.env.DB);
   const task = await db.select().from(tasks).where(eq(tasks.id, id)).get();
   if (!task) return c.json({ error: "not found" }, 404);
+  if (task.status === "done") return c.json({ error: "已完成的任务不可删除" }, 400);
   const event = await db.select().from(events).where(eq(events.id, task.eventId)).get();
   if (!event || event.createdBy !== member.id) return c.json({ error: "forbidden" }, 403);
   await db.delete(tasks).where(eq(tasks.id, id));

@@ -27,7 +27,7 @@ export interface CreateEventInput {
   date: string;
   recurrence: Recurrence;
   color: AccentColor;
-  subjectId?: string | null;
+  subjectIds?: string[];
   subtasks?: string[];
 }
 
@@ -37,7 +37,7 @@ export interface EventPatch {
   date?: string;
   recurrence?: Recurrence;
   color?: AccentColor;
-  subjectId?: string | null;
+  subjectIds?: string[];
 }
 
 export const api = {

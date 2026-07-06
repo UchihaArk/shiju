@@ -31,6 +31,15 @@ export function toTask(r: TaskRow): TaskDTO {
 }
 
 export function toEvent(r: EventRow, taskIds: string[]): EventDTO {
+  let subjectIds: string[] = [];
+  if (r.subjectIds) {
+    try {
+      const parsed = JSON.parse(r.subjectIds);
+      if (Array.isArray(parsed)) subjectIds = parsed.filter((x): x is string => typeof x === "string");
+    } catch {
+      subjectIds = [];
+    }
+  }
   return {
     id: r.id,
     title: r.title,
@@ -39,7 +48,7 @@ export function toEvent(r: EventRow, taskIds: string[]): EventDTO {
     recurrence: r.recurrence as EventDTO["recurrence"],
     createdBy: r.createdBy,
     color: r.color,
-    subjectId: r.subjectId,
+    subjectIds,
     taskIds,
   };
 }

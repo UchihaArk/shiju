@@ -47,10 +47,19 @@ reportRouter.get("/", async (c) => {
     publishes: publishMap.get(m.id) ?? 0,
   }));
 
-  // 围绕角色（主角）事件数
+  // 围绕角色（主角）事件数（一个事项可有多名主角，各计一次）
   const subjectCounts = new Map<string, number>();
   for (const e of allEvents) {
-    if (e.subjectId) subjectCounts.set(e.subjectId, (subjectCounts.get(e.subjectId) ?? 0) + 1);
+    let ids: string[] = [];
+    if (e.subjectIds) {
+      try {
+        const parsed = JSON.parse(e.subjectIds);
+        if (Array.isArray(parsed)) ids = parsed.filter((x): x is string => typeof x === "string");
+      } catch {
+        ids = [];
+      }
+    }
+    for (const id of ids) subjectCounts.set(id, (subjectCounts.get(id) ?? 0) + 1);
   }
   const subjectStats = members
     .map((m) => ({

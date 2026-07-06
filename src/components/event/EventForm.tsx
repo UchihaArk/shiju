@@ -46,7 +46,7 @@ export function EventForm({
   const [recurrence, setRecurrence] = useState<FamilyEvent["recurrence"]>(event?.recurrence ?? "once");
   const [color, setColor] = useState<AccentColor>(event?.color ?? "rose");
   const [note, setNote] = useState(event?.note ?? "");
-  const [subjectId, setSubjectId] = useState<string | null>(event?.subjectId ?? null);
+  const [subjectIds, setSubjectIds] = useState<string[]>(event?.subjectIds ?? []);
   const [subtasks, setSubtasks] = useState<string[]>([""]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -66,9 +66,9 @@ export function EventForm({
     setSubmitting(true);
     try {
       if (editing && event) {
-        await updateEvent(event.id, { title, note, date, recurrence, color, subjectId });
+        await updateEvent(event.id, { title, note, date, recurrence, color, subjectIds });
       } else {
-        await addEvent({ title, note, date, recurrence, color, subjectId, subtasks });
+        await addEvent({ title, note, date, recurrence, color, subjectIds, subtasks });
       }
       onDone();
     } catch (err) {
@@ -125,38 +125,33 @@ export function EventForm({
         </div>
       </GlassCard>
 
-      {/* 主角 / 围绕谁 */}
+      {/* 主角 / 围绕谁（多选，角色名） */}
       <GlassCard className="px-4 py-3">
         <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-rose-deep/70">
           <User className="h-3.5 w-3.5" />
-          主角 / 围绕谁（可选）
+          主角 / 围绕谁（可多选）
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setSubjectId(null)}
-            className={cn(
-              "grid h-9 w-9 place-items-center rounded-full bg-white/40 text-xs text-rose-deep/50 transition active:scale-90",
-              subjectId === null && "ring-2 ring-rose-deep ring-offset-2 ring-offset-white/40",
-            )}
-          >
-            无
-          </button>
-          {members.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => setSubjectId(m.id)}
-              aria-label={m.role}
-              className={cn(
-                "grid h-9 w-9 place-items-center rounded-full text-lg transition active:scale-90",
-                ACCENT[m.color].soft,
-                subjectId === m.id && "ring-2 ring-rose-deep ring-offset-2 ring-offset-white/40",
-              )}
-            >
-              {m.emoji}
-            </button>
-          ))}
+          {members.map((m) => {
+            const selected = subjectIds.includes(m.id);
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() =>
+                  setSubjectIds((prev) =>
+                    selected ? prev.filter((x) => x !== m.id) : [...prev, m.id],
+                  )
+                }
+                className={cn(
+                  "rounded-full px-3 py-1.5 text-xs font-medium transition active:scale-95",
+                  selected ? ACCENT[m.color].solid : "bg-white/40 text-rose-deep/55",
+                )}
+              >
+                {m.role}
+              </button>
+            );
+          })}
         </div>
       </GlassCard>
 

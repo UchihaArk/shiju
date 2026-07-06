@@ -24,7 +24,7 @@ export const events = sqliteTable("events", {
     .notNull()
     .references(() => users.id),
   color: text("color").notNull(),
-  subjectId: text("subject_id").references(() => users.id), // 主角/围绕者（可空）
+  subjectIds: text("subject_id"), // 复用 0002 列名；去掉 FK 以存 JSON string[]
 });
 
 /** 子任务（→ 前端 Task，认领机制） */

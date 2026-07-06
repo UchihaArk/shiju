@@ -48,7 +48,7 @@ export interface FamilyEvent {
   recurrence: Recurrence;
   createdBy: string;
   color: AccentColor;
-  subjectId: string | null; // 主角 / 围绕者
+  subjectIds: string[]; // 主角 / 围绕者（可多选）
   taskIds: string[];
 }
 
