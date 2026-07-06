@@ -47,6 +47,22 @@ reportRouter.get("/", async (c) => {
     publishes: publishMap.get(m.id) ?? 0,
   }));
 
+  // 围绕角色（主角）事件数
+  const subjectCounts = new Map<string, number>();
+  for (const e of allEvents) {
+    if (e.subjectId) subjectCounts.set(e.subjectId, (subjectCounts.get(e.subjectId) ?? 0) + 1);
+  }
+  const subjectStats = members
+    .map((m) => ({
+      id: m.id,
+      role: m.role,
+      emoji: m.emoji,
+      color: m.color,
+      count: subjectCounts.get(m.id) ?? 0,
+    }))
+    .filter((s) => s.count > 0)
+    .sort((a, b) => b.count - a.count);
+
   return c.json({
     doneCount,
     totalEvents: allEvents.length,
@@ -56,5 +72,6 @@ reportRouter.get("/", async (c) => {
     busiestMonthCount: maxMonthCount,
     monthCounts,
     memberStats,
+    subjectStats,
   });
 });

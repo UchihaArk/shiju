@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { api, type CreateEventInput } from "./api";
+import { api, type CreateEventInput, type EventPatch } from "./api";
 import { clearAll, getUid, setUid } from "./identity";
 import { MEMBERS } from "@/data/seed"; // API 不可用时的登录页兜底
 import type { FamilyEvent, Member, Task } from "@/types";
@@ -27,6 +27,11 @@ interface StoreValue {
   addEvent: (input: CreateEventInput) => Promise<FamilyEvent>;
   claimTask: (taskId: string) => Promise<void>;
   completeTask: (taskId: string) => Promise<void>;
+  updateEvent: (id: string, patch: EventPatch) => Promise<void>;
+  deleteEvent: (id: string) => Promise<void>;
+  addTask: (eventId: string, title: string) => Promise<void>;
+  updateTask: (taskId: string, title: string) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
   resetAll: () => void;
 }
 
@@ -126,6 +131,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setTasks((prev) => prev.map((t) => (t.id === taskId ? updated : t)));
   }, []);
 
+  const updateEvent = useCallback(async (id: string, patch: EventPatch) => {
+    const updated = await api.updateEvent(id, patch);
+    setEvents((prev) => prev.map((e) => (e.id === id ? updated : e)));
+  }, []);
+
+  const deleteEvent = useCallback(async (id: string) => {
+    await api.deleteEvent(id);
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+    setTasks((prev) => prev.filter((t) => t.eventId !== id));
+  }, []);
+
+  const addTask = useCallback(async (eventId: string, title: string) => {
+    const t = await api.addTask(eventId, title);
+    setTasks((prev) => [...prev, t]);
+  }, []);
+
+  const updateTask = useCallback(async (taskId: string, title: string) => {
+    const t = await api.updateTask(taskId, title);
+    setTasks((prev) => prev.map((x) => (x.id === taskId ? t : x)));
+  }, []);
+
+  const deleteTask = useCallback(async (taskId: string) => {
+    await api.deleteTask(taskId);
+    setTasks((prev) => prev.filter((x) => x.id !== taskId));
+  }, []);
+
   const resetAll = useCallback(() => {
     clearAll();
     setMember(null);
@@ -148,6 +179,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addEvent,
       claimTask,
       completeTask,
+      updateEvent,
+      deleteEvent,
+      addTask,
+      updateTask,
+      deleteTask,
       resetAll,
     }),
     [
@@ -164,6 +200,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addEvent,
       claimTask,
       completeTask,
+      updateEvent,
+      deleteEvent,
+      addTask,
+      updateTask,
+      deleteTask,
       resetAll,
     ],
   );

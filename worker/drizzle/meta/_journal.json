@@ -15,6 +15,13 @@
       "when": 1783314598776,
       "tag": "0001_nervous_korvac",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783338228607,
+      "tag": "0002_common_captain_cross",
+      "breakpoints": true
     }
   ]
 }

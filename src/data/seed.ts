@@ -59,7 +59,7 @@ export const MEMBER_BY_ID: Record<string, Member> = Object.fromEntries(
 );
 
 /** ~10 条事项，跨过去 / 今日 / 未来，子任务覆盖三态。 */
-export const SEED_EVENTS: FamilyEvent[] = [
+export const SEED_EVENTS = [
   {
     id: "e_outing",
     title: "全家郊游踏青",
@@ -157,7 +157,7 @@ export const SEED_EVENTS: FamilyEvent[] = [
   },
 ];
 
-export const SEED_TASKS: Task[] = [
+export const SEED_TASKS = [
   // 郊游（过去，全部完成）
   { id: "t_outing_1", eventId: "e_outing", title: "准备野餐食物", assigneeId: "u_ma", status: "done", doneAt: "2026-06-27T20:00:00.000Z" },
   { id: "t_outing_2", eventId: "e_outing", title: "开车接送", assigneeId: "u_ba", status: "done", doneAt: "2026-06-27T21:00:00.000Z" },

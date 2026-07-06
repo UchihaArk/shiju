@@ -1,0 +1,1 @@
+ALTER TABLE `events` ADD `subject_id` text REFERENCES users(id);

@@ -111,6 +111,45 @@ export default function ReportPage() {
                 <span className="ml-2 inline-block h-1.5 w-3 rounded-full bg-amber align-middle" /> 发布
               </p>
             </GlassCard>
+
+            {/* 围绕角色（主角）事件统计 */}
+            <GlassCard className="mt-3 px-4 py-4">
+              <h2 className="mb-3 text-sm font-semibold text-rose-deep">围绕角色 · 主角榜</h2>
+              {data.subjectStats.length === 0 ? (
+                <p className="py-4 text-center text-xs text-rose-deep/40">
+                  还没有标记主角的事项
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {data.subjectStats
+                    .map((s) => ({ s, max: Math.max(1, ...data.subjectStats.map((x) => x.count)) }))
+                    .map(({ s, max }) => (
+                      <div key={s.id} className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "grid h-9 w-9 shrink-0 place-items-center rounded-xl text-lg",
+                            ACCENT[s.color as keyof typeof ACCENT]?.soft,
+                          )}
+                        >
+                          {s.emoji}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex items-center justify-between text-[11px]">
+                            <span className="font-medium text-rose-deep">{s.role}</span>
+                            <span className="text-rose-deep/50">{s.count} 项</span>
+                          </div>
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/50">
+                            <div
+                              className="h-full rounded-full bg-pink"
+                              style={{ width: `${(s.count / max) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </GlassCard>
           </>
         )}
       </PhoneFrame>

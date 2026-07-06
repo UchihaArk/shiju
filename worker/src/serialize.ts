@@ -39,6 +39,7 @@ export function toEvent(r: EventRow, taskIds: string[]): EventDTO {
     recurrence: r.recurrence as EventDTO["recurrence"],
     createdBy: r.createdBy,
     color: r.color,
+    subjectId: r.subjectId,
     taskIds,
   };
 }

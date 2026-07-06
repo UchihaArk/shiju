@@ -27,7 +27,17 @@ export interface CreateEventInput {
   date: string;
   recurrence: Recurrence;
   color: AccentColor;
-  subtasks: string[];
+  subjectId?: string | null;
+  subtasks?: string[];
+}
+
+export interface EventPatch {
+  title?: string;
+  note?: string | null;
+  date?: string;
+  recurrence?: Recurrence;
+  color?: AccentColor;
+  subjectId?: string | null;
 }
 
 export const api = {
@@ -39,6 +49,14 @@ export const api = {
       method: "POST",
       body: JSON.stringify(input),
     }),
+  updateEvent: (id: string, patch: EventPatch) =>
+    req<FamilyEvent>(`/api/events/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
+  deleteEvent: (id: string) => req<{ ok: boolean }>(`/api/events/${id}`, { method: "DELETE" }),
+  addTask: (eventId: string, title: string) =>
+    req<Task>(`/api/events/${eventId}/tasks`, { method: "POST", body: JSON.stringify({ title }) }),
+  updateTask: (id: string, title: string) =>
+    req<Task>(`/api/tasks/${id}`, { method: "PATCH", body: JSON.stringify({ title }) }),
+  deleteTask: (id: string) => req<{ ok: boolean }>(`/api/tasks/${id}`, { method: "DELETE" }),
   claimTask: (id: string) => req<Task>(`/api/tasks/${id}/claim`, { method: "POST" }),
   completeTask: (id: string) => req<Task>(`/api/tasks/${id}/complete`, { method: "POST" }),
   registerSubscription: (s: { endpoint: string; keys: { p256dh: string; auth: string } }) =>
@@ -62,6 +80,14 @@ export interface MemberStat {
   publishes: number;
 }
 
+export interface SubjectStat {
+  id: string;
+  role: string;
+  emoji: string;
+  color: string;
+  count: number;
+}
+
 export interface ReportData {
   doneCount: number;
   totalEvents: number;
@@ -71,4 +97,5 @@ export interface ReportData {
   busiestMonthCount: number;
   monthCounts: number[];
   memberStats: MemberStat[];
+  subjectStats: SubjectStat[];
 }

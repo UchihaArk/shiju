@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, CalendarDays, Repeat, Palette, ListChecks } from "lucide-react";
+import { Plus, Trash2, CalendarDays, Repeat, Palette, ListChecks, User } from "lucide-react";
 import { GlassCard } from "@/components/theme/GlassCard";
 import { useStore } from "@/lib/store";
 import { ACCENT } from "@/lib/colors";
@@ -29,20 +29,24 @@ function validDate(s?: string | null): string | null {
 export function EventForm({
   onDone,
   initialDate,
+  event,
 }: {
   onDone: () => void;
   initialDate?: string | null;
+  event?: FamilyEvent;
 }) {
-  const { addEvent } = useStore();
+  const { addEvent, updateEvent, members } = useStore();
+  const editing = !!event;
   const now = today();
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(event?.title ?? "");
   const [date, setDate] = useState(
-    () => validDate(initialDate) ?? ymd(now.getFullYear(), now.getMonth() + 1, now.getDate()),
+    () => event?.date ?? validDate(initialDate) ?? ymd(now.getFullYear(), now.getMonth() + 1, now.getDate()),
   );
-  const [recurrence, setRecurrence] = useState<FamilyEvent["recurrence"]>("once");
-  const [color, setColor] = useState<AccentColor>("rose");
-  const [note, setNote] = useState("");
+  const [recurrence, setRecurrence] = useState<FamilyEvent["recurrence"]>(event?.recurrence ?? "once");
+  const [color, setColor] = useState<AccentColor>(event?.color ?? "rose");
+  const [note, setNote] = useState(event?.note ?? "");
+  const [subjectId, setSubjectId] = useState<string | null>(event?.subjectId ?? null);
   const [subtasks, setSubtasks] = useState<string[]>([""]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -61,7 +65,11 @@ export function EventForm({
     if (!title.trim() || submitting) return;
     setSubmitting(true);
     try {
-      await addEvent({ title, note, date, recurrence, color, subtasks });
+      if (editing && event) {
+        await updateEvent(event.id, { title, note, date, recurrence, color, subjectId });
+      } else {
+        await addEvent({ title, note, date, recurrence, color, subjectId, subtasks });
+      }
       onDone();
     } catch (err) {
       console.error(err);
@@ -117,6 +125,41 @@ export function EventForm({
         </div>
       </GlassCard>
 
+      {/* 主角 / 围绕谁 */}
+      <GlassCard className="px-4 py-3">
+        <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-rose-deep/70">
+          <User className="h-3.5 w-3.5" />
+          主角 / 围绕谁（可选）
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setSubjectId(null)}
+            className={cn(
+              "grid h-9 w-9 place-items-center rounded-full bg-white/40 text-xs text-rose-deep/50 transition active:scale-90",
+              subjectId === null && "ring-2 ring-rose-deep ring-offset-2 ring-offset-white/40",
+            )}
+          >
+            无
+          </button>
+          {members.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => setSubjectId(m.id)}
+              aria-label={m.role}
+              className={cn(
+                "grid h-9 w-9 place-items-center rounded-full text-lg transition active:scale-90",
+                ACCENT[m.color].soft,
+                subjectId === m.id && "ring-2 ring-rose-deep ring-offset-2 ring-offset-white/40",
+              )}
+            >
+              {m.emoji}
+            </button>
+          ))}
+        </div>
+      </GlassCard>
+
       {/* 颜色 */}
       <GlassCard className="px-4 py-3">
         <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-rose-deep/70">
@@ -151,42 +194,44 @@ export function EventForm({
         />
       </GlassCard>
 
-      {/* 子任务 */}
-      <GlassCard className="px-4 py-3">
-        <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-rose-deep/70">
-          <ListChecks className="h-3.5 w-3.5" />
-          子任务（家人可认领）
-        </div>
-        <div className="space-y-2">
-          {subtasks.map((s, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                value={s}
-                onChange={(e) => setSubtask(i, e.target.value)}
-                placeholder={`子任务 ${i + 1}，如：买菜`}
-                className="w-full rounded-xl bg-white/45 px-3 py-2 text-sm text-rose-deep placeholder:text-rose-deep/35 focus:outline-none"
-              />
-              {subtasks.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeSubtask(i)}
-                  aria-label="删除"
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/40 text-rose-deep/50 active:scale-90"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={addSubtask}
-          className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/40 px-3 py-1.5 text-xs text-rose-deep active:scale-95"
-        >
-          <Plus className="h-3 w-3" /> 添加子任务
-        </button>
-      </GlassCard>
+      {/* 子任务（仅新建） */}
+      {!editing && (
+        <GlassCard className="px-4 py-3">
+          <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-rose-deep/70">
+            <ListChecks className="h-3.5 w-3.5" />
+            子任务（家人可认领）
+          </div>
+          <div className="space-y-2">
+            {subtasks.map((s, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  value={s}
+                  onChange={(e) => setSubtask(i, e.target.value)}
+                  placeholder={`子任务 ${i + 1}，如：买菜`}
+                  className="w-full rounded-xl bg-white/45 px-3 py-2 text-sm text-rose-deep placeholder:text-rose-deep/35 focus:outline-none"
+                />
+                {subtasks.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeSubtask(i)}
+                    aria-label="删除"
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/40 text-rose-deep/50 active:scale-90"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addSubtask}
+            className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/40 px-3 py-1.5 text-xs text-rose-deep active:scale-95"
+          >
+            <Plus className="h-3 w-3" /> 添加子任务
+          </button>
+        </GlassCard>
+      )}
 
       {/* 提交 */}
       <button
@@ -199,7 +244,7 @@ export function EventForm({
             : "cursor-not-allowed bg-white/40 text-rose-deep/40",
         )}
       >
-        {submitting ? "发布中…" : "发布事项"}
+        {submitting ? (editing ? "保存中…" : "发布中…") : editing ? "保存修改" : "发布事项"}
       </button>
     </form>
   );
