@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ListTodo, CalendarDays, Archive, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -12,7 +13,6 @@ const TABS = [
 ] as const;
 
 export function BottomNav() {
-  const router = useRouter();
   const pathname = usePathname();
 
   return (
@@ -22,10 +22,11 @@ export function BottomNav() {
           const active = pathname === t.href;
           const Icon = t.icon;
           return (
-            <button
+            <Link
               key={t.key}
-              type="button"
-              onClick={() => router.push(t.href)}
+              href={t.href}
+              prefetch
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-1.5 transition active:scale-95",
                 active ? "text-rose-deep" : "text-rose-deep/45",
@@ -33,7 +34,7 @@ export function BottomNav() {
             >
               <Icon className="h-5 w-5" />
               <span className="text-[10px] font-medium">{t.label}</span>
-            </button>
+            </Link>
           );
         })}
       </div>

@@ -26,13 +26,14 @@ export default function LoginPage() {
 
   return (
     <PhoneFrame className="pt-[calc(env(safe-area-inset-top)+18px)]">
-      <div className="mb-5 overflow-hidden rounded-3xl border border-white/50 shadow-lg">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/launch.jpg"
-          alt="拾聚 · 家庭协作 · 全景日历"
-          className="block w-full"
-        />
+      <div className="mb-7 flex flex-col items-center gap-3">
+        <div className="grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br from-rose to-orange text-4xl font-bold text-white shadow-lg">
+          拾
+        </div>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-rose-deep">拾聚</h1>
+          <p className="text-sm text-rose-deep/60">家庭协作 · 全景日历</p>
+        </div>
       </div>
 
       <GlassCard className="px-5 py-6">

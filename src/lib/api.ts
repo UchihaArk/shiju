@@ -7,11 +7,18 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const headers: Record<string, string> = init?.body ? { "Content-Type": "application/json" } : {};
   const uid = getUid();
   if (uid) headers["x-user-id"] = uid;
-  const res = await fetch(`${BASE}${path}`, { ...init, headers });
-  if (!res.ok) {
-    throw Object.assign(new Error(`${res.status} ${path}`), { status: res.status });
+  // 超时保护：移动端网络挂起时强制中止，避免卡在启动页
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 7000);
+  try {
+    const res = await fetch(`${BASE}${path}`, { ...init, headers, signal: controller.signal });
+    if (!res.ok) {
+      throw Object.assign(new Error(`${res.status} ${path}`), { status: res.status });
+    }
+    return (await res.json()) as T;
+  } finally {
+    clearTimeout(timer);
   }
-  return (await res.json()) as T;
 }
 
 export interface CreateEventInput {

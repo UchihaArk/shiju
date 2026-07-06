@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "拾聚 · 家庭协作 · 全景日历",
   description: "极客家庭的私有化协作中枢与全景大事件轴",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, title: "拾聚", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "拾聚", statusBarStyle: "black-translucent" },
   icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
 };
 
