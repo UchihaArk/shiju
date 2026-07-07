@@ -45,7 +45,7 @@ export const MEMBERS: Member[] = [
   {
     id: "u_xm",
     role: "小满",
-    name: "小满 · 小满",
+    name: "晚辈 · 小满",
     shortName: "小满",
     emoji: "🧒",
     color: "pink",

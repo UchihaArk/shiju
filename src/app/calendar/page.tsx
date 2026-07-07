@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { PhoneFrame } from "@/components/theme/PhoneFrame";
+import { AppShell } from "@/components/theme/AppShell";
 import { GlassCard } from "@/components/theme/GlassCard";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { DayDetail } from "@/components/calendar/DayDetail";
@@ -94,69 +94,73 @@ export default function CalendarPage() {
   const accent = ACCENT[member.color];
 
   return (
-    <PhoneFrame className="pt-[calc(env(safe-area-inset-top)+14px)] pb-28">
-        {/* 顶栏 */}
-        <header className="mb-3 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => router.push("/home")}
-            className="flex items-center gap-2 rounded-full bg-white/40 py-1 pl-1 pr-3 backdrop-blur-sm active:scale-95"
-          >
-            <span className={cn("grid h-8 w-8 place-items-center rounded-full text-lg", accent.soft)}>
-              {member.emoji}
-            </span>
-            <span className="text-xs font-medium text-rose-deep">{member.role}</span>
-          </button>
-          <div className="flex items-center gap-1">
-            <PushToggle />
+    <AppShell
+      top={
+        <>
+          {/* 顶栏 */}
+          <header className="mb-3 flex items-center justify-between">
             <button
               type="button"
-              onClick={() => router.push(`/events/new?date=${selectedKey}`)}
-              aria-label="新建事项"
-              className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-rose to-orange text-white shadow active:scale-95"
+              onClick={() => router.push("/home")}
+              className="flex items-center gap-2 rounded-full bg-white/40 py-1 pl-1 pr-3 backdrop-blur-sm active:scale-95"
             >
-              <Plus className="h-5 w-5" />
+              <span className={cn("grid h-8 w-8 place-items-center rounded-full text-lg", accent.soft)}>
+                {member.emoji}
+              </span>
+              <span className="text-xs font-medium text-rose-deep">{member.role}</span>
             </button>
-          </div>
-        </header>
+            <div className="flex items-center gap-1">
+              <PushToggle />
+              <button
+                type="button"
+                onClick={() => router.push(`/events/new?date=${selectedKey}`)}
+                aria-label="新建事项"
+                className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-rose to-orange text-white shadow active:scale-95"
+              >
+                <Plus className="h-5 w-5" />
+              </button>
+            </div>
+          </header>
 
-        {/* 标题 + 月份切换 */}
-        <div className="mb-3 flex items-center justify-between px-1">
-          <div>
-            <h1 className="text-xl font-bold text-rose-deep">
-              {view.year}年 {CN_MONTHS[view.month - 1]}
-            </h1>
-            <p className="text-[11px] text-rose-deep/50">家庭全景日历</p>
+          {/* 标题 + 月份切换 */}
+          <div className="mb-1 flex items-center justify-between px-1">
+            <div>
+              <h1 className="text-xl font-bold text-rose-deep">
+                {view.year}年 {CN_MONTHS[view.month - 1]}
+              </h1>
+              <p className="text-[11px] text-rose-deep/50">家庭全景日历</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => changeMonth(-1)}
+                aria-label="上个月"
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/40 text-rose-deep backdrop-blur-sm active:scale-95"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => changeMonth(1)}
+                aria-label="下个月"
+                className="grid h-8 w-8 place-items-center rounded-full bg-white/40 text-rose-deep backdrop-blur-sm active:scale-95"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => changeMonth(-1)}
-              aria-label="上个月"
-              className="grid h-8 w-8 place-items-center rounded-full bg-white/40 text-rose-deep backdrop-blur-sm active:scale-95"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => changeMonth(1)}
-              aria-label="下个月"
-              className="grid h-8 w-8 place-items-center rounded-full bg-white/40 text-rose-deep backdrop-blur-sm active:scale-95"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+        </>
+      }
+    >
+      {/* 月历 */}
+      <GlassCard className="px-3 py-3">
+        <CalendarGrid days={days} selectedKey={selectedDay.solarDate} onSelect={selectDay} />
+      </GlassCard>
 
-        {/* 月历 */}
-        <GlassCard className="px-3 py-3">
-          <CalendarGrid days={days} selectedKey={selectedDay.solarDate} onSelect={selectDay} />
-        </GlassCard>
-
-        {/* 事件区：日历底部 */}
-        <div ref={detailRef} className="mt-3 scroll-mt-3">
-          <DayDetail day={selectedDay} />
-        </div>
-      </PhoneFrame>
+      {/* 事件区：日历底部 */}
+      <div ref={detailRef} className="mt-3 scroll-mt-3">
+        <DayDetail day={selectedDay} />
+      </div>
+    </AppShell>
   );
 }

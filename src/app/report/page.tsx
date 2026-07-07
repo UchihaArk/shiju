@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PhoneFrame } from "@/components/theme/PhoneFrame";
+import { AppShell } from "@/components/theme/AppShell";
 import { GlassCard } from "@/components/theme/GlassCard";
 import { useStore } from "@/lib/store";
 import { api, type ReportData } from "@/lib/api";
@@ -45,11 +45,16 @@ export default function ReportPage() {
   const loading = !data && !err;
 
   return (
-    <PhoneFrame className="pt-[calc(env(safe-area-inset-top)+14px)] pb-28">
-      <h1 className="mb-1 px-1 text-xl font-bold text-rose-deep">家庭年度报告</h1>
-      <p className="mb-3 px-1 text-[11px] text-rose-deep/50">
-        数据来自全家共享的家庭大盘{loading ? " · 生成中…" : ""}
-      </p>
+    <AppShell
+      top={
+        <>
+          <h1 className="mb-1 px-1 text-xl font-bold text-rose-deep">家庭年度报告</h1>
+          <p className="mb-1 px-1 text-[11px] text-rose-deep/50">
+            数据来自全家共享的家庭大盘{loading ? " · 生成中…" : ""}
+          </p>
+        </>
+      }
+    >
 
       {/* KPI */}
       <div className="mb-3 grid grid-cols-3 gap-2">
@@ -174,7 +179,7 @@ export default function ReportPage() {
       {err && (
         <p className="mt-3 text-center text-xs text-rose-deep/40">报告加载失败，请确认后端已启动 🤔</p>
       )}
-    </PhoneFrame>
+    </AppShell>
   );
 }
 

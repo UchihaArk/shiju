@@ -1,16 +1,11 @@
-/** PWA 启动图：hydration / 路由判断期间全屏展示 launch.jpg。 */
+import { Loader2 } from "lucide-react";
+
+/** hydration / 路由判断期间的极简占位（暖底 + 小转圈）。
+ *  原生启动图由 manifest + apple-touch-startup-image 负责，不在这里展示。 */
 export function Splash() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#ffcdd2]">
-      <div className="relative h-full w-full max-w-[430px] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/launch.jpg"
-          alt="拾聚 · 家庭协作 · 全景日历"
-          className="absolute inset-0 h-full w-full object-cover"
-          draggable={false}
-        />
-      </div>
+    <div className="flex min-h-dvh items-center justify-center bg-[#ffcdd2]">
+      <Loader2 className="h-7 w-7 animate-spin text-rose-deep/50" />
     </div>
   );
 }
