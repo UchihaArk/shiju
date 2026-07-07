@@ -14,8 +14,8 @@ const TABS = [
 
 export function BottomNav() {
   const pathname = usePathname();
-  // 登录页 / 事项详情与编辑页不显示底栏
-  if (pathname === "/login" || pathname.startsWith("/events")) return null;
+  // 启动守卫页 / 登录页 / 事项详情与编辑页不显示底栏
+  if (pathname === "/" || pathname === "/login" || pathname.startsWith("/events")) return null;
 
   return (
     <nav className="fixed bottom-0 left-1/2 z-30 w-full max-w-[430px] -translate-x-1/2 px-4 pb-[max(env(safe-area-inset-bottom),10px)]">
