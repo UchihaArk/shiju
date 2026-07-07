@@ -43,7 +43,7 @@ npx web-push generate-vapid-keys
 # 写入密钥（粘贴上一步的值）
 npx wrangler secret put VAPID_PUBLIC_KEY
 npx wrangler secret put VAPID_PRIVATE_KEY
-npx wrangler secret put VAPID_SUBJECT      # 输入 mailto:你的邮箱@example.com
+npx wrangler secret put VAPID_SUBJECT      # 输入 mailto:你的邮箱@example.com（注意只能有一个冒号！曾因误填 mailto:: 双冒号，导致 Apple 以 BadJwtToken 拒收全部推送）
 
 # 部署
 npm run deploy

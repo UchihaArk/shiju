@@ -1,12 +1,10 @@
 import webpush from "web-push";
 import type { AppEnv } from "./types";
 
-let initialized = false;
-
+// 每次调用都重新设置 VAPID：setVapidDetails 很轻量，且避免 isolate 复用时
+// 密钥被旧值缓存（曾因 initialized 标志导致换密钥后仍用旧私钥签名）。
 export function initPush(env: AppEnv) {
-  if (initialized) return;
   webpush.setVapidDetails(env.VAPID_SUBJECT, env.VAPID_PUBLIC_KEY, env.VAPID_PRIVATE_KEY);
-  initialized = true;
 }
 
 export interface PushSub {
@@ -27,8 +25,10 @@ export async function sendPush(
     return true;
   } catch (err: unknown) {
     const code = (err as { statusCode?: number })?.statusCode ?? 0;
+    const body = (err as { body?: { toString(): string } })?.body?.toString().slice(0, 200) ?? "";
     if (code === 404 || code === 410) return false; // 失效订阅
-    console.error("[push] send error", code, (err as Error)?.message);
+    // 记下 push 服务返回的具体原因（如 VapidPkHashMismatch / BadJwtToken），便于排查
+    console.error("[push] send error", code, body, (err as Error)?.message);
     return false;
   }
 }
