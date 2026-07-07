@@ -48,15 +48,17 @@ export default function ArchivePage() {
 
   const { start, end } = periodRange(g, year, quarter, month);
   const byMonth = g !== "month";
+  // 全部事项只展示「已发生」的（今天及之前），未来的不显示
+  const viewEnd = end.getTime() < now.getTime() ? end : now;
 
   const items = useMemo<Item[]>(() => {
     const list: Item[] = [];
     for (const e of events) {
-      for (const d of occurrencesInRange(e, start, end)) list.push({ event: e, date: d });
+      for (const d of occurrencesInRange(e, start, viewEnd)) list.push({ event: e, date: d });
     }
     list.sort((a, b) => a.date.getTime() - b.date.getTime());
     return list;
-  }, [events, start, end]);
+  }, [events, start, viewEnd]);
 
   const groups = useMemo(() => {
     const map = new Map<string, { key: string; date: Date; items: Item[] }>();

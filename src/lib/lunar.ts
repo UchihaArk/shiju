@@ -19,8 +19,11 @@ function buildJieQiMap(year: number): Map<string, string> {
 
 /** 事件是否落在指定阳历日（处理 once/monthly/yearly 循环）。 */
 export function eventOccursOn(event: FamilyEvent, y: number, m: number, d: number): boolean {
-  const [ey, em, ed] = event.date.split("-").map(Number);
-  if (event.recurrence === "once") return event.date === ymd(y, m, d);
+  const key = ymd(y, m, d);
+  // 循环事项从其起始日（event.date，即新建日）开始发生，起始日之前不算
+  if (key < event.date) return false;
+  if (event.recurrence === "once") return key === event.date;
+  const [, em, ed] = event.date.split("-").map(Number);
   if (event.recurrence === "monthly") return ed === d;
   // yearly：同月同日
   return em === m && ed === d;
@@ -157,10 +160,13 @@ export function lunarTextOf(date: Date): string {
 /** 事项在 [start, end] 区间内的所有发生日（once/monthly/yearly 全展开）。归档页用。 */
 export function occurrencesInRange(event: FamilyEvent, start: Date, end: Date): Date[] {
   const out: Date[] = [];
-  const [, em, ed] = event.date.split("-").map(Number);
+  const [ey, em, ed] = event.date.split("-").map(Number);
+  const anchor = new Date(ey, em - 1, ed); // 事项起始日（新建日）
   const s = startOfDay(start);
   const e = endOfDay(end);
-  const inRange = (d: Date) => d >= s && d <= e;
+  // 循环事项不早于起始日发生
+  const lower = s < anchor ? anchor : s;
+  const inRange = (d: Date) => d >= lower && d <= e;
 
   if (event.recurrence === "once") {
     const [y, m, d] = event.date.split("-").map(Number);
