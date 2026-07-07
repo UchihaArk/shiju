@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 const TABS = [
   { key: "home", label: "事项", icon: ListTodo, href: "/home" },
   { key: "calendar", label: "日历", icon: CalendarDays, href: "/calendar" },
-  { key: "archive", label: "全部", icon: Archive, href: "/archive" },
+  { key: "archive", label: "历史", icon: Archive, href: "/archive" },
   { key: "report", label: "报告", icon: BarChart3, href: "/report" },
 ] as const;
 

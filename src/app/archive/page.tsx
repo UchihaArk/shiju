@@ -13,9 +13,9 @@ import { cn } from "@/lib/cn";
 import { Splash } from "@/components/ui/Splash";
 import type { FamilyEvent } from "@/types";
 
-type Granularity = "year" | "quarter" | "month";
+type Granularity = "month" | "quarter" | "year";
 const WEEKDAY = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-const GRAN_LABEL: Record<Granularity, string> = { year: "年度", quarter: "季度", month: "月度" };
+const GRAN_LABEL: Record<Granularity, string> = { month: "月度", quarter: "季度", year: "年度" };
 
 function periodRange(
   g: Granularity,
@@ -48,7 +48,7 @@ export default function ArchivePage() {
 
   const { start, end } = periodRange(g, year, quarter, month);
   const byMonth = g !== "month";
-  // 全部事项只展示「已发生」的（今天及之前），未来的不显示
+  // 历史事项只展示「已发生」的（今天及之前），未来的不显示
   const viewEnd = end.getTime() < now.getTime() ? end : now;
 
   const items = useMemo<Item[]>(() => {
@@ -95,8 +95,8 @@ export default function ArchivePage() {
     <AppShell
       top={
         <>
-          <h1 className="mb-1 px-1 text-xl font-bold text-rose-deep">全部事项</h1>
-          <p className="mb-1 px-1 text-[11px] text-rose-deep/50">按 年度 / 季度 / 月度 查询全部事项</p>
+          <h1 className="mb-1 px-1 text-xl font-bold text-rose-deep">历史事项</h1>
+          <p className="mb-1 px-1 text-[11px] text-rose-deep/50">按 月度 / 季度 / 年度 查询历史事项</p>
         </>
       }
     >
